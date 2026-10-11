@@ -1,0 +1,52 @@
+---
+import { instagram, whatsappNumber } from '../data/site';
+---
+<section class="contact section-shell" id="contact" aria-labelledby="contact-title">
+  <div class="section-heading"><span class="eyebrow">07 / Your next chapter</span><span class="section-note">Start a conversation</span></div>
+  <div class="contact-grid">
+    <div class="contact-copy reveal"><p class="explorer-label">Let’s talk about your goals</p><h2 id="contact-title">YOUR<br /><em>NEXT MOVE.</em></h2><p>Tell Mohamed where you are now and where you want to go. A good plan starts with understanding you.</p><a class="contact-instagram" href={instagram} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".5" /></svg><span>Follow Mohamed<small>@_mohamed_ahizoune</small></span><span aria-hidden="true">↗</span></a></div>
+    <div class="form-shell reveal"><div class="form-core">
+      <form id="coaching-enquiry" data-whatsapp-number={whatsappNumber}>
+        <div class="form-intro"><h3>Your coaching enquiry</h3><span>Made around you.</span></div>
+        <div class="form-fields"><label>Your name<input name="name" autocomplete="name" placeholder="Full name" required maxlength="100" /></label><label>Your phone<input name="phone" type="tel" autocomplete="tel" placeholder="Include your country code" required maxlength="30" minlength="7" /></label><label>Your goal<select name="goal" required><option value="" disabled selected>Select your goal</option><option>Build muscle</option><option>Get stronger</option><option>Body recomposition</option><option>Competition preparation</option><option>Build a consistent routine</option></select></label><label>Coaching pack<select name="pack" required><option value="" disabled selected>Choose a pack</option><option>Starter Pack</option><option>Transformation Pack</option><option>Elite Pack</option><option>I’d like your advice</option></select></label><label class="field-wide">Training experience<select name="experience" required><option value="" disabled selected>Your current starting point</option><option>New to training</option><option>Less than one year</option><option>One to three years</option><option>More than three years</option><option>Returning after a break</option></select></label><label class="field-wide">Tell Mohamed a little more <span class="optional-label">Optional</span><textarea name="message" rows="3" maxlength="1000" placeholder="Your goals, weekly availability, or questions about coaching"></textarea></label></div>
+        <input type="hidden" name="program" value="" />
+        <p id="selected-program" class="selected-program" hidden></p>
+        <button class="button button-lime form-submit" type="submit">Prepare my enquiry <span aria-hidden="true">↗</span></button>
+        <p class="form-note">Review your message before sending. Your details are not stored on this website.</p>
+      </form>
+      <div class="enquiry-review" id="enquiry-review" hidden><div class="review-heading"><h3>Your message is ready</h3><button type="button" class="edit-enquiry">Edit details <span aria-hidden="true">↗</span></button></div><pre class="message-preview" id="message-preview"></pre><a class="button button-lime" id="whatsapp-link" target="_blank" rel="noopener noreferrer" hidden>Continue on WhatsApp <span aria-hidden="true">↗</span></a><p class="whatsapp-pending" hidden>WhatsApp contact is coming soon. Copy your enquiry and send it to Mohamed on Instagram.</p><div class="review-actions"><button type="button" class="copy-enquiry">Copy my message <span aria-hidden="true">↗</span></button><a href={instagram} target="_blank" rel="noopener noreferrer">Open Instagram <span aria-hidden="true">↗</span></a></div><p class="copy-status" role="status" aria-live="polite"></p></div>
+      <noscript><p>Contact Mohamed directly on <a href={instagram}>Instagram</a> to discuss your goals.</p></noscript>
+    </div></div>
+  </div>
+</section>
+<script>
+  const form = document.querySelector<HTMLFormElement>('#coaching-enquiry');
+  const review = document.querySelector<HTMLElement>('#enquiry-review');
+  const preview = document.querySelector<HTMLElement>('#message-preview');
+  const status = document.querySelector<HTMLElement>('.copy-status');
+  let enquiry = '';
+  form?.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const fields = new FormData(form);
+    enquiry = ['Hello Mohamed, I’d like to discuss coaching.', '', `Name: ${String(fields.get('name')).trim()}`, `Phone: ${String(fields.get('phone')).trim()}`, `Goal: ${fields.get('goal')}`, `Coaching pack: ${fields.get('pack')}`, `Training experience: ${fields.get('experience')}`, fields.get('program') ? `Program interest: ${fields.get('program')}` : '', fields.get('message') ? `\nMy message:\n${String(fields.get('message')).trim()}` : ''].filter(Boolean).join('\n');
+    if (preview) preview.textContent = enquiry;
+    if (status) status.textContent = '';
+    const phone = form.dataset.whatsappNumber ?? '';
+    const configured = /^[1-9]\d{7,14}$/.test(phone);
+    const whatsapp = document.querySelector<HTMLAnchorElement>('#whatsapp-link');
+    const pending = document.querySelector<HTMLElement>('.whatsapp-pending');
+    if (whatsapp) { whatsapp.hidden = !configured; if (configured) whatsapp.href = `https://wa.me/${phone}?text=${encodeURIComponent(enquiry)}`; }
+    if (pending) pending.hidden = configured;
+    form.hidden = true;
+    if (review) { review.hidden = false; preview?.setAttribute('tabindex', '-1'); preview?.focus({ preventScroll: true }); }
+  });
+  document.querySelector('.edit-enquiry')?.addEventListener('click', () => { if (form) form.hidden = false; if (review) review.hidden = true; form?.querySelector<HTMLInputElement>('input[name="name"]')?.focus({ preventScroll: true }); });
+  document.querySelector('.copy-enquiry')?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(enquiry); if (status) status.textContent = 'Copied. Paste your message into your conversation with Mohamed.'; }
+    catch { if (preview) { const range = document.createRange(); range.selectNodeContents(preview); const selection = window.getSelection(); selection?.removeAllRanges(); selection?.addRange(range); } if (status) status.textContent = 'Select the message above and copy it to send to Mohamed.'; }
+  });
+  const reopen = () => { if (form) form.hidden = false; if (review) review.hidden = true; };
+  document.querySelectorAll<HTMLElement>('[data-pack-choice]').forEach(link => link.addEventListener('click', () => { reopen(); const pack = form?.querySelector<HTMLSelectElement>('[name="pack"]'); if (pack) pack.value = link.dataset.packChoice ?? ''; }));
+  document.querySelectorAll<HTMLElement>('[data-program-choice]').forEach(link => link.addEventListener('click', () => { reopen(); const value = link.dataset.programChoice ?? ''; const input = form?.querySelector<HTMLInputElement>('[name="program"]'); if (input) input.value = value; const label = document.querySelector<HTMLElement>('#selected-program'); if (label) { label.textContent = `Program interest: ${value}`; label.hidden = false; } const goal = form?.querySelector<HTMLSelectElement>('[name="goal"]'); if (goal) goal.value = value === 'Strength foundation' ? 'Get stronger' : value === 'Upper / lower split' ? 'Build muscle' : 'Build a consistent routine'; }));
+</script>

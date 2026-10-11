@@ -1,0 +1,77 @@
+---
+import { trainingPrograms } from '../data/programs';
+const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+---
+<section class="programs-section section-shell" id="programs" aria-labelledby="programs-title">
+  <div class="section-heading"><span class="eyebrow">02 / Inside the training</span><span class="section-note">Explore a sample week</span></div>
+  <div class="section-intro reveal"><h2 id="programs-title">See the work.<br /><em>Find your rhythm.</em></h2><p>Select a goal. Open a session.<br />Get a feel for what training could look like.</p></div>
+  <div class="program-explorer reveal">
+    <div class="program-sidebar">
+      <span class="explorer-label">What are you training for?</span>
+      <div class="goal-tabs" data-tab-group role="tablist" aria-label="Training goals" aria-orientation="vertical">
+        {trainingPrograms.map((program, index) => <button class="goal-tab" id={`goal-${program.id}`} role="tab" aria-selected={index === 0 ? 'true' : 'false'} aria-controls={`program-${program.id}`} tabindex={index === 0 ? 0 : -1}><span class="goal-tab-number">0{index + 1}</span><span><strong>{program.goal}</strong><small>{program.name}</small></span><span class="goal-tab-arrow" aria-hidden="true">↗</span></button>)}
+      </div>
+      <div class="sidebar-footnote"><span class="sidebar-rule"></span><p>A sample gives you a starting point.<br />Coaching makes it yours.</p><a href="#pricing">Explore coaching packs <span aria-hidden="true">↗</span></a></div>
+    </div>
+    <div class="workout-shell"><div class="workout-core">
+      {trainingPrograms.map((program, index) => <article class="workout-panel" id={`program-${program.id}`} role="tabpanel" aria-labelledby={`goal-${program.id}`} tabindex="0" hidden={index !== 0}>
+        <div class="workout-header"><div><span class="explorer-label">Sample program / 0{index + 1}</span><h3>{program.name}</h3></div><span class="workout-frequency">{program.frequency}</span></div>
+        <p class="workout-description">{program.description}</p>
+        <div class="workout-meta"><span><small>Equipment</small>{program.equipment}</span><span><small>Suited to</small>{program.level}</span></div>
+        <div class="week-strip" aria-label="Example weekly schedule">{program.schedule.map((label, day) => <div class:list={['week-day', { 'is-training': label !== 'Rest' }]}><span>{weekdays[day]}</span><strong>{label}</strong></div>)}</div>
+        <div class="session-heading"><span class="explorer-label">Session preview</span><span class="session-hint">Choose a day below</span></div>
+        <div class="session-tabs" data-tab-group role="tablist" aria-label={`${program.name} sessions`}>{program.sessions.map((session, day) => <button role="tab" id={`day-${program.id}-${day}`} aria-selected={day === 0 ? 'true' : 'false'} aria-controls={`session-${program.id}-${day}`} tabindex={day === 0 ? 0 : -1}>{session.day}<span>{session.title}</span></button>)}</div>
+        {program.sessions.map((session, day) => <div class="session-panel" role="tabpanel" id={`session-${program.id}-${day}`} aria-labelledby={`day-${program.id}-${day}`} hidden={day !== 0}>
+          <div class="exercise-columns" aria-hidden="true"><span>Movement / focus</span><span>Sets × reps</span></div>
+          <ul class="exercise-list">{session.exercises.map(exercise => <li><label><input type="checkbox" aria-label={`Mark ${exercise.name} complete for ${session.day}`} /><span class="exercise-check" aria-hidden="true"></span><span class="exercise-name"><strong>{exercise.name}</strong><small>{exercise.focus}</small></span><span class="exercise-prescription">{exercise.sets}</span></label></li>)}</ul>
+          <div class="session-progress"><output aria-live="polite">0 / {session.exercises.length} movements checked</output><button class="reset-session" type="button">Reset checklist</button></div>
+        </div>)}
+        <p class="workout-note">{program.note}</p>
+        <div class="workout-actions"><button class="download-program" type="button" data-program={program.id}>Save sample week <span aria-hidden="true">↓</span></button><a href="#contact" data-program-choice={program.name}>Make it personal <span aria-hidden="true">↗</span></a></div>
+        <p class="program-source">Based on <a href={program.source} target="_blank" rel="noopener noreferrer">{program.sourceName} ↗</a>. Examples, adapted through coaching.</p>
+      </article>)}
+    </div></div>
+  </div>
+</section>
+<script>
+  import { trainingPrograms } from '../data/programs';
+  document.querySelectorAll<HTMLElement>('[data-tab-group]').forEach(group => {
+    const tabs = Array.from(group.querySelectorAll<HTMLButtonElement>(':scope > [role="tab"]'));
+    const select = (tab: HTMLButtonElement) => tabs.forEach(item => {
+      const active = item === tab;
+      item.setAttribute('aria-selected', String(active));
+      item.tabIndex = active ? 0 : -1;
+      const panel = document.getElementById(item.getAttribute('aria-controls') ?? '');
+      if (panel) panel.hidden = !active;
+    });
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => select(tab));
+      tab.addEventListener('keydown', event => {
+        const vertical = group.getAttribute('aria-orientation') === 'vertical';
+        const next = vertical ? 'ArrowDown' : 'ArrowRight';
+        const previous = vertical ? 'ArrowUp' : 'ArrowLeft';
+        let target = index;
+        if (event.key === next) target = (index + 1) % tabs.length;
+        else if (event.key === previous) target = (index - 1 + tabs.length) % tabs.length;
+        else if (event.key === 'Home') target = 0;
+        else if (event.key === 'End') target = tabs.length - 1;
+        else return;
+        event.preventDefault(); select(tabs[target]); tabs[target].focus();
+      });
+    });
+  });
+  document.querySelectorAll<HTMLElement>('.session-panel').forEach(panel => {
+    const inputs = Array.from(panel.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'));
+    const output = panel.querySelector('output');
+    const update = () => { if (output) output.textContent = `${inputs.filter(input => input.checked).length} / ${inputs.length} movements checked`; };
+    inputs.forEach(input => input.addEventListener('change', update));
+    panel.querySelector('.reset-session')?.addEventListener('click', () => { inputs.forEach(input => { input.checked = false; }); update(); });
+  });
+  document.querySelectorAll<HTMLButtonElement>('.download-program').forEach(button => button.addEventListener('click', () => {
+    const program = trainingPrograms.find(item => item.id === button.dataset.program);
+    if (!program) return;
+    const text = ['MOHAMED AHIZOUNE | SAMPLE WEEK', program.name, program.frequency, `Equipment: ${program.equipment}`, '', program.description, '', ...program.sessions.flatMap(session => [session.day + ' | ' + session.title, ...session.exercises.map(exercise => `${exercise.name}: ${exercise.sets}`), '']), program.note, '', `Source: ${program.source}`, '', 'This is a program preview. Contact Mohamed for a plan tailored to your goals.', 'https://www.instagram.com/_mohamed_ahizoune/'].join('\n');
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+    const anchor = document.createElement('a'); anchor.href = url; anchor.download = `mohamed-ahizoune-${program.id}-sample.txt`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }));
+</script>
