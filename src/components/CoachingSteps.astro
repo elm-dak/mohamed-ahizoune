@@ -1,0 +1,9 @@
+---
+import SvgMark from './SvgMark.astro';
+const steps = [
+  ['message', 'Tell me your goal', 'Share your starting point and what you want to achieve.'],
+  ['plan', 'Build your direction', 'Discuss your training, nutrition, and the support that fits.'],
+  ['progress', 'Review your progress', 'Track the work and adjust your approach as you develop.'],
+];
+---
+<ol class="coaching-steps" aria-label="How coaching starts">{steps.map(([mark, title, description], index) => <li><span class="step-mark"><SvgMark kind={mark} /></span><div><span class="step-number">0{index + 1}</span><h3>{title}</h3><p>{description}</p></div></li>)}</ol>

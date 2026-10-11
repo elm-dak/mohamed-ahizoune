@@ -29,6 +29,9 @@ Import this folder as its own repository, or set the Vercel project Root Directo
 
 - Edit page content and Instagram links in `src/pages/index.astro`.
 - Edit the design foundation in `src/styles/global.css` and the refined components and light theme in `src/styles/refinement.css`.
+- Custom SVG marks live in `src/components/SvgMark.astro`, with their component styling in `src/styles/visual-details.css`. No icon package is used.
+- The coaching fit selector lets visitors pick a goal and support level, then carries both choices into the contact form. It suggests a pack to discuss, not a personalized training prescription.
+- A compact enquiry link appears after the hero, and hides while the contact section or footer is visible.
 - Edit sample training routines in `src/data/programs.ts`. Source links are included in the explorer and downloads. Upper/lower and dumbbell sessions are excerpts, not complete personalized plans.
 - Pricing is 10% below the supplied reference: Starter MAD 900, Transformation MAD 2,519.10, Elite MAD 4,049.10 per month. Pack features match the supplied screenshot.
 - WhatsApp is configured for `212661328967` in `src/data/site.ts`. The form prepares a message with the visitor's details, selected pack, and program interest. The visitor reviews it before opening WhatsApp and sending it. It never sends or stores personal data automatically.

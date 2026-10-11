@@ -1,0 +1,28 @@
+---
+import SvgMark from './SvgMark.astro';
+---
+<div class="pack-finder reveal" id="pack-finder" aria-labelledby="fit-title">
+  <div class="fit-intro"><span class="fit-drawing"><SvgMark kind="goal" /></span><p class="explorer-label">A little direction</p><h3 id="fit-title">Find your coaching fit.</h3><p>Pick your goal and the support you want.<br />We’ll point you to a pack to explore.</p></div>
+  <div class="fit-controls">
+    <fieldset><legend>01 / Your focus</legend><div class="fit-options"><label><input type="radio" name="fit-goal" value="Build muscle" checked /><span><SvgMark kind="physique" />Muscle</span></label><label><input type="radio" name="fit-goal" value="Get stronger" /><span><SvgMark kind="strength" />Strength</span></label><label><input type="radio" name="fit-goal" value="Competition preparation" /><span><SvgMark kind="competition" />Stage</span></label></div></fieldset>
+    <fieldset><legend>02 / Your support</legend><div class="fit-options fit-support"><label><input type="radio" name="fit-support" value="Starter Pack" /><span>Essentials<small>Build a routine</small></span></label><label><input type="radio" name="fit-support" value="Transformation Pack" checked /><span>Complete<small>Training & nutrition</small></span></label><label><input type="radio" name="fit-support" value="Elite Pack" /><span>Personal<small>Closer guidance</small></span></label></div></fieldset>
+    <div class="fit-result" aria-live="polite" aria-atomic="true"><div><small id="fit-focus">Your focus: Build muscle</small><strong id="fit-pack-name">Transformation Pack</strong><p id="fit-pack-detail">A complete training plan, nutrition guidance, and regular feedback.</p></div><a href="#contact" class="fit-result-link" data-pack-choice="Transformation Pack" data-goal-choice="Build muscle"><span>Discuss this fit</span><SvgMark kind="arrow" /></a></div>
+  </div>
+</div>
+<script>
+  const finder = document.querySelector<HTMLElement>('#pack-finder');
+  const explanations: Record<string, string> = {
+    'Starter Pack': 'Training structure, basic nutrition guidance, and weekly check ins.',
+    'Transformation Pack': 'A complete training plan, nutrition guidance, and regular feedback.',
+    'Elite Pack': 'One to one coaching, priority support, and performance focused guidance.',
+  };
+  finder?.addEventListener('change', () => {
+    const goal = finder.querySelector<HTMLInputElement>('input[name="fit-goal"]:checked')?.value ?? 'Build muscle';
+    const pack = finder.querySelector<HTMLInputElement>('input[name="fit-support"]:checked')?.value ?? 'Transformation Pack';
+    const name = finder.querySelector('#fit-pack-name'); const detail = finder.querySelector('#fit-pack-detail'); const focus = finder.querySelector('#fit-focus');
+    if (name) name.textContent = pack; if (detail) detail.textContent = explanations[pack];
+    if (focus) focus.textContent = `Your focus: ${goal}`;
+    const link = finder.querySelector<HTMLAnchorElement>('.fit-result-link');
+    if (link) { link.dataset.packChoice = pack; link.dataset.goalChoice = goal; }
+  });
+</script>

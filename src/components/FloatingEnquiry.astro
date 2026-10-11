@@ -1,0 +1,16 @@
+---
+import SvgMark from './SvgMark.astro';
+---
+<div class="floating-enquiry" hidden><a href="#contact"><span class="floating-mark"><SvgMark kind="message" /></span><span>Let’s build your next chapter<small>Start your coaching enquiry</small></span><SvgMark kind="arrow" /></a></div>
+<script>
+  const floating = document.querySelector<HTMLElement>('.floating-enquiry');
+  const hero = document.querySelector('.hero'); const contact = document.querySelector('#contact'); const footer = document.querySelector('.site-footer');
+  if (floating && hero && contact && footer && 'IntersectionObserver' in window) {
+    const visibility = new Map<Element, boolean>([[hero, true], [contact, false], [footer, false]]);
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => visibility.set(entry.target, entry.isIntersecting));
+      floating.hidden = Boolean(visibility.get(hero) || visibility.get(contact) || visibility.get(footer));
+    });
+    [hero, contact, footer].forEach(element => observer.observe(element));
+  }
+</script>

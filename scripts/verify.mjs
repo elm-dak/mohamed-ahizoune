@@ -8,7 +8,7 @@ for (const [name, width, height] of [['desktop', 1440, 1000], ['mobile', 390, 84
   const page = await browser.newPage({ viewport: { width, height }, reducedMotion: 'reduce', colorScheme: 'dark' });
   page.on('pageerror', error => failures.push(`${name}: ${error.message}`));
   const response = await page.goto('http://127.0.0.1:4321', { waitUntil: 'networkidle' });
-  if (response.status() !== 200) failures.push(`${name}: HTTP ${response.status()}`);
+  if (response.status() !== 200) throw new Error(`${name}: HTTP ${response.status()}, preview did not load`);
   await page.evaluate(() => Promise.all([...document.images].map(async image => { image.loading = 'eager'; try { await image.decode(); } catch {} })));
   const state = await page.evaluate(() => ({
     overflow: document.documentElement.scrollWidth > innerWidth,
@@ -34,6 +34,24 @@ for (const [name, width, height] of [['desktop', 1440, 1000], ['mobile', 390, 84
   await expect(page.locator('#achievements')).toContainText('NPC Pro Qualifier Marrakech');
   await expect(page.locator('#achievements')).toContainText('Finals Moroccan Championship');
   await expect(page.locator('#achievements')).toContainText('The Réal Contest');
+  const finder = page.locator('#pack-finder');
+  for (const pack of ['Starter Pack', 'Transformation Pack', 'Elite Pack']) {
+    await finder.locator(`input[value="${pack}"]`).check();
+    await expect(page.locator('#fit-pack-name')).toHaveText(pack);
+  }
+  await finder.locator('input[value="Competition preparation"]').check();
+  await expect(page.locator('#fit-focus')).toHaveText('Your focus: Competition preparation');
+  await finder.getByRole('link', { name: 'Discuss this fit' }).click();
+  await expect(page.locator('select[name="goal"]')).toHaveValue('Competition preparation');
+  await expect(page.locator('select[name="pack"]')).toHaveValue('Elite Pack');
+  await finder.locator('input[value="Build muscle"]').check();
+  await finder.locator('input[value="Transformation Pack"]').check();
+  await page.locator('#programs').scrollIntoViewIfNeeded();
+  await expect(page.locator('.floating-enquiry')).toBeVisible();
+  await page.locator('#contact').scrollIntoViewIfNeeded();
+  await expect(page.locator('.floating-enquiry')).toBeHidden();
+  const marks = page.locator('.svg-mark');
+  if (await marks.count() < 25) failures.push(`${name}: missing SVG visual system`);
   const checkDashes = async () => {
     const text = await page.locator('body').innerText();
     if (/[-–—]/.test(text)) failures.push(`${name}: dash in visible copy: ${text.split('\n').filter(line => /[-–—]/.test(line)).join(' | ')}`);
@@ -100,7 +118,7 @@ for (const [name, width, height] of [['desktop', 1440, 1000], ['mobile', 390, 84
     await page.screenshot({ path: `artifacts/${name}-${theme}-hero.png` });
     await page.screenshot({ path: `artifacts/${name}-${theme}.png`, fullPage: true });
     if (name === 'desktop') {
-      for (const section of ['about', 'programs', 'pricing', 'achievements', 'contact']) await page.locator(`#${section}`).screenshot({ path: `artifacts/${section}-${theme}.png` });
+      for (const section of ['about', 'programs', 'skills', 'pricing', 'pack-finder', 'achievements', 'contact']) await page.locator(`#${section}`).screenshot({ path: `artifacts/${section}-${theme}.png` });
     }
   }
   await page.reload({ waitUntil: 'networkidle' });
@@ -110,7 +128,7 @@ for (const [name, width, height] of [['desktop', 1440, 1000], ['mobile', 390, 84
   await page.screenshot({ path: `artifacts/${name}-hero.png` });
   await page.screenshot({ path: `artifacts/${name}.png`, fullPage: true });
   await page.close();
-  console.log(`${name}: both themes, goal and day tabs, checklist, downloads, pricing, achievements, contact form, encoded WhatsApp branch, theme persistence, layout, assets, and navigation passed`);
+  console.log(`${name}: SVG graphics, coaching fit selector, enquiry visibility, both themes, program controls, downloads, pricing, achievements, contact form, WhatsApp destination, theme persistence, layout, assets, and navigation passed`);
 }
 await browser.close();
 if (failures.length) { console.error(failures.join('\n')); process.exitCode = 1; }

@@ -1,11 +1,12 @@
 ---
+import SvgMark from './SvgMark.astro';
 const skills = [
-  ['01', 'Strength & hypertrophy', 'Structured training with clear progression, focused on building muscle and improving strength.'],
-  ['02', 'Physique development', 'Work toward a balanced physique through training, nutrition guidance, and consistent progress reviews.'],
-  ['03', 'Nutrition & daily habits', 'Practical nutrition guidance and everyday routines that support your training goals.'],
-  ['04', 'Technique & form feedback', 'Review movement quality, refine your execution, and get more purpose from each session.'],
-  ['05', 'Competition preparation', 'A focused conversation around Men’s Physique goals, stage presentation, and performance.'],
-  ['06', 'Personal progress tracking', 'Regular check ins, adjustments, and support as your training and goals develop.'],
+  ['strength', 'Strength & hypertrophy', 'Structured training with clear progression, focused on building muscle and improving strength.'],
+  ['physique', 'Physique development', 'Work toward a balanced physique through training, nutrition guidance, and consistent progress reviews.'],
+  ['nutrition', 'Nutrition & daily habits', 'Practical nutrition guidance and everyday routines that support your training goals.'],
+  ['technique', 'Technique & form feedback', 'Review movement quality, refine your execution, and get more purpose from each session.'],
+  ['competition', 'Competition preparation', 'A focused conversation around Men’s Physique goals, stage presentation, and performance.'],
+  ['progress', 'Personal progress tracking', 'Regular check ins, adjustments, and support as your training and goals develop.'],
 ];
 ---
-<section class="skills-section section-shell" id="skills" aria-labelledby="skills-title"><div class="section-heading"><span class="eyebrow">Coaching expertise</span><span class="section-note">The support behind your progress</span></div><div class="skills-grid"><div class="skills-intro reveal"><h2 id="skills-title">More than<br /><em>a workout.</em></h2><p>Training, nutrition, and personal feedback. Connected through a coach who understands the work.</p><a class="text-link" href="#pricing">Find your coaching pack <span aria-hidden="true">↗</span></a></div><div class="skills-list">{skills.map(([number, title, description]) => <article class="skill-row reveal"><span>{number}</span><div><h3>{title}</h3><p>{description}</p></div><span class="skill-arrow" aria-hidden="true">↗</span></article>)}</div></div></section>
+<section class="skills-section section-shell" id="skills" aria-labelledby="skills-title"><div class="section-heading"><span class="eyebrow">Coaching expertise</span><span class="section-note">The support behind your progress</span></div><div class="skills-grid"><div class="skills-intro reveal"><h2 id="skills-title">More than<br /><em>a workout.</em></h2><p>Training, nutrition, and personal feedback. Connected through a coach who understands the work.</p><div class="skills-sketch" aria-hidden="true"><SvgMark kind="physique" /><div><span>A strong foundation.</span><span>A personal direction.</span></div><SvgMark kind="progress" /></div><a class="text-link" href="#pack-finder">Find your coaching fit <span aria-hidden="true">↗</span></a></div><div class="skills-list">{skills.map(([mark, title, description]) => <article class="skill-row reveal"><span class="skill-glyph"><SvgMark kind={mark} /></span><div><h3>{title}</h3><p>{description}</p></div></article>)}</div></div></section>

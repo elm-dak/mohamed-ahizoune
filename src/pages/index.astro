@@ -1,10 +1,13 @@
 ---
 import '../styles/global.css';
 import '../styles/refinement.css';
+import '../styles/visual-details.css';
 import ProgramExplorer from '../components/ProgramExplorer.astro';
 import Pricing from '../components/Pricing.astro';
 import ContactForm from '../components/ContactForm.astro';
 import Skills from '../components/Skills.astro';
+import SvgMark from '../components/SvgMark.astro';
+import FloatingEnquiry from '../components/FloatingEnquiry.astro';
 import { instagram } from '../data/site';
 const faqs = [
   ['Where do I start?', 'Fill in the contact form with your goal and training experience. Review your enquiry, then use the available contact option to send it to Mohamed.'],
@@ -66,12 +69,12 @@ const faqs = [
       <Skills />
       <Pricing />
       <section class="achievements-section section-shell" id="achievements" aria-labelledby="achievements-title">
-        <div class="section-heading"><span class="eyebrow">04 / Achievements</span><span class="section-note">Men’s Physique competitor</span></div>
+        <div class="section-heading"><span class="eyebrow">04 / Achievements</span><span class="section-note achievement-origin"><SvgMark kind="morocco" />Men’s Physique competitor</span></div>
         <div class="achievement-grid">
           <div class="achievement-copy reveal"><h2 id="achievements-title">Achievements.<br /><em>Earned on stage.</em></h2><p>Six years of experience. Three podium finishes. Mohamed’s journey as a Men’s Physique competitor, in the results.</p>
-            <div class="achievement-record"><strong>02<span>PLACE</span></strong><div><span>NPC Pro Qualifier Marrakech</span><p>2026 · Second place</p></div></div>
-            <div class="achievement-record"><strong>03<span>PLACE</span></strong><div><span>Finals Moroccan Championship</span><p>2026 · Third place</p></div></div>
-            <div class="achievement-record"><strong>03<span>PLACE</span></strong><div><span>The Réal Contest</span><p>2023 · Junior category · Third place</p></div></div>
+            <div class="achievement-record"><strong>02<span>PLACE</span></strong><div><span>NPC Pro Qualifier Marrakech</span><p><SvgMark kind="medal" />2026 · Second place</p></div></div>
+            <div class="achievement-record"><strong>03<span>PLACE</span></strong><div><span>Finals Moroccan Championship</span><p><SvgMark kind="medal" />2026 · Third place</p></div></div>
+            <div class="achievement-record"><strong>03<span>PLACE</span></strong><div><span>The Réal Contest</span><p><SvgMark kind="medal" />2023 · Junior category · Third place</p></div></div>
             <p class="achievement-attribution">Results listed on Mohamed’s Instagram profile.</p><a class="text-link" href={instagram} target="_blank" rel="noopener noreferrer">View his Instagram <span aria-hidden="true">↗</span></a>
           </div>
           <div class="achievement-photo-shell reveal"><figure class="achievement-photo"><img src="/images/mohamed-award.webp" alt="Mohamed Ahizoune receiving a medal and holding his competition certificate" width="598" height="798" loading="lazy" /><figcaption><span>Recognition on stage</span><a href={instagram} target="_blank" rel="noopener noreferrer">@_mohamed_ahizoune ↗</a></figcaption></figure></div>
@@ -84,6 +87,7 @@ const faqs = [
       <ContactForm />
     </main>
     <footer class="site-footer"><a class="footer-name" href="#home">MOHAMED AHIZOUNE<span>.</span></a><div><span>© {new Date().getFullYear()} Mohamed Ahizoune</span><span>BUILT WITH PURPOSE.</span><a href="#home">BACK TO TOP <span aria-hidden="true">↑</span></a></div></footer>
+    <FloatingEnquiry />
     <script>
       const themeToggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
       const updateTheme = (theme: string) => {
