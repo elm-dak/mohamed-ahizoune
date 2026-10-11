@@ -1,6 +1,7 @@
 ---
 import SvgMark from './SvgMark.astro';
 import PackFinder from './PackFinder.astro';
+import PackComparison from './PackComparison.astro';
 const marks = ['plan', 'goal', 'competition'];
 const packs = [
   { name: 'Starter Pack', price: '900', cents: '', label: 'For your first chapter', description: 'A clear starting point. Structure, guidance, and a routine to build on.', features: ['Fitness assessment and goal review', '2 tailored training sessions per week', 'Basic nutrition guidance', 'Weekly progress check in', 'Access to habit tracking template'], featured: false },
@@ -13,5 +14,6 @@ const packs = [
   <div class="section-intro reveal"><h2 id="pricing-title">Invest in the work.<br /><em>And in yourself.</em></h2><p>Choose the level of support you need.<br />Every pack starts with a conversation.</p></div>
   <PackFinder />
   <div class="pricing-grid">{packs.map((pack, index) => <article class:list={['price-shell', 'reveal', { 'is-featured': pack.featured }]}><div class="price-card"><div class="price-card-top"><span>0{index + 1}</span><span>{pack.label}</span></div><div class="pack-heading"><SvgMark kind={marks[index]} /><h3>{pack.name}</h3></div><p class="pack-description">{pack.description}</p><div class="pack-price"><span class="currency">MAD</span><strong>{pack.price}<small>{pack.cents}</small></strong><span class="price-period">per month</span></div><div class="pack-divider"></div><p class="included-label">Your coaching includes</p><ul>{pack.features.map(feature => <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8 3 3 7-7" /></svg><span>{feature}</span></li>)}</ul><a class:list={['button', pack.featured ? 'button-lime' : 'button-outline']} href="#contact" data-pack-choice={pack.name}>Choose {pack.name.replace(' Pack', '')}<span aria-hidden="true"><SvgMark kind="arrow" /></span></a></div></article>)}</div>
+  <PackComparison />
   <div class="pricing-footnote"><span>Monthly coaching · Prices in Moroccan dirhams</span><a href="#faq">Questions before you start? <span aria-hidden="true">↗</span></a></div>
 </section>

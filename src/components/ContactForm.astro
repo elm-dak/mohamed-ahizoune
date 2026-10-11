@@ -12,21 +12,65 @@ import CoachingSteps from './CoachingSteps.astro';
         <div class="form-intro"><h3><SvgMark kind="message" />Your coaching enquiry</h3><span>Made around you.</span></div>
         <div class="form-fields"><label>Your name<input name="name" autocomplete="name" placeholder="Full name" required maxlength="100" /></label><label>Your phone<input name="phone" type="tel" autocomplete="tel" placeholder="Include your country code" required maxlength="30" minlength="7" /></label><label>Your goal<select name="goal" required><option value="" disabled selected>Select your goal</option><option>Build muscle</option><option>Get stronger</option><option>Body recomposition</option><option>Competition preparation</option><option>Build a consistent routine</option></select></label><label>Coaching pack<select name="pack" required><option value="" disabled selected>Choose a pack</option><option>Starter Pack</option><option>Transformation Pack</option><option>Elite Pack</option><option>I’d like your advice</option></select></label><label class="field-wide">Training experience<select name="experience" required><option value="" disabled selected>Your current starting point</option><option>New to training</option><option>Less than one year</option><option>One to three years</option><option>More than three years</option><option>Returning after a break</option></select></label><label class="field-wide">Tell Mohamed a little more <span class="optional-label">Optional</span><textarea name="message" rows="3" maxlength="1000" placeholder="Your goals, weekly availability, or questions about coaching"></textarea></label></div>
         <input type="hidden" name="program" value="" />
-        <p id="selected-program" class="selected-program" hidden></p>
+        <div id="pack-context" class="pack-context" aria-live="polite" hidden><span>Your selected monthly coaching</span><strong id="pack-context-price"></strong><p id="pack-context-detail"></p></div>
+        <div id="selected-program" class="selected-program" hidden><span id="selected-program-label"></span><button type="button" class="remove-program" aria-label="Remove selected sample program">Remove</button></div>
+        <p class="selection-status" role="status" aria-live="polite"></p>
         <button class="button button-lime form-submit" type="submit">Prepare my enquiry <span aria-hidden="true">↗</span></button>
         <p class="form-note">Review your message before sending. Your details are not stored on this website.</p>
       </form>
-      <div class="enquiry-review" id="enquiry-review" hidden><div class="review-heading"><h3>Your message is ready</h3><button type="button" class="edit-enquiry">Edit details <span aria-hidden="true">↗</span></button></div><pre class="message-preview" id="message-preview"></pre><a class="button button-lime" id="whatsapp-link" target="_blank" rel="noopener noreferrer" hidden>Continue on WhatsApp <span aria-hidden="true"><SvgMark kind="whatsapp" /></span></a><p class="whatsapp-pending" hidden>WhatsApp contact is coming soon. Copy your enquiry and send it to Mohamed on Instagram.</p><div class="review-actions"><button type="button" class="copy-enquiry">Copy my message <span aria-hidden="true">↗</span></button><a href={instagram} target="_blank" rel="noopener noreferrer">Open Instagram <span aria-hidden="true">↗</span></a></div><p class="copy-status" role="status" aria-live="polite"></p></div>
+      <div class="enquiry-review" id="enquiry-review" role="region" aria-labelledby="review-title" hidden><div class="review-heading"><h3 id="review-title" tabindex="-1">Your message is ready</h3><button type="button" class="edit-enquiry">Edit details <span aria-hidden="true">↗</span></button></div><p class="review-note">Check your details below. You choose when to send your message.</p><pre class="message-preview" id="message-preview"></pre><a class="button button-lime" id="whatsapp-link" target="_blank" rel="noopener noreferrer" hidden>Continue on WhatsApp <span aria-hidden="true"><SvgMark kind="whatsapp" /></span></a><p class="whatsapp-pending" hidden>WhatsApp contact is coming soon. Copy your enquiry and send it to Mohamed on Instagram.</p><div class="review-actions"><button type="button" class="copy-enquiry">Copy my message <span aria-hidden="true">↗</span></button><a href={instagram} target="_blank" rel="noopener noreferrer">Open Instagram <span aria-hidden="true">↗</span></a></div><p class="copy-status" role="status" aria-live="polite"></p></div>
       <noscript><p>Contact Mohamed directly on <a href={instagram}>Instagram</a> to discuss your goals.</p></noscript>
     </div></div>
   </div>
 </section>
+<style>
+  .pack-context{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--lime) 5%,transparent)}
+  .pack-context>span{display:block;font-size:10px;color:var(--muted);margin-bottom:9px}
+  .pack-context>strong{font-size:19px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.4}
+  .pack-context>p{font-size:11px;color:var(--muted);line-height:1.7;margin-top:8px}
+  .selected-program{display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding-bottom:10px}
+  .remove-program{flex-shrink:0;border:0;background:transparent;color:var(--ink);font-family:inherit;font-size:11px;padding:12px 0 12px 12px;text-decoration:underline;text-underline-offset:4px;min-height:44px}
+  .remove-program:hover{color:var(--lime)}
+  .selection-status,.review-note{font-size:11px;color:var(--muted);line-height:1.8;margin-top:13px}
+  .selection-status:empty{display:none}
+  #review-title:focus-visible{outline:2px solid var(--lime);outline-offset:7px;border-radius:3px}
+</style>
 <script>
   const form = document.querySelector<HTMLFormElement>('#coaching-enquiry');
   const review = document.querySelector<HTMLElement>('#enquiry-review');
   const preview = document.querySelector<HTMLElement>('#message-preview');
   const status = document.querySelector<HTMLElement>('.copy-status');
+  const packSelect = form?.querySelector<HTMLSelectElement>('[name="pack"]');
+  const programInput = form?.querySelector<HTMLInputElement>('[name="program"]');
+  const programSelection = document.querySelector<HTMLElement>('#selected-program');
+  const selectionStatus = document.querySelector<HTMLElement>('.selection-status');
+  const packs: Record<string, { price: string; detail: string }> = {
+    'Starter Pack': { price: 'MAD 900 per month', detail: 'Your starting point for training structure, nutrition guidance, and weekly progress.' },
+    'Transformation Pack': { price: 'MAD 2,519.10 per month', detail: 'A customized training program with nutrition guidance and regular coaching feedback.' },
+    'Elite Pack': { price: 'MAD 4,049.10 per month', detail: 'One to one coaching with closer support for your performance goals.' },
+  };
+  let lastEditedField: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null = null;
   let enquiry = '';
+  const updatePackContext = () => {
+    const context = document.querySelector<HTMLElement>('#pack-context');
+    const price = document.querySelector<HTMLElement>('#pack-context-price');
+    const detail = document.querySelector<HTMLElement>('#pack-context-detail');
+    const selected = packs[packSelect?.value ?? ''];
+    if (context) context.hidden = !packSelect?.value;
+    if (price) price.textContent = selected?.price ?? 'Find the right fit together';
+    if (detail) detail.textContent = selected?.detail ?? 'Tell Mohamed about your goals and he can help you choose a coaching pack.';
+  };
+  const focusInView = (element: HTMLElement | null | undefined) => {
+    if (!element) return;
+    element.focus({ preventScroll: true });
+    element.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+  };
+  form?.addEventListener('focusin', event => {
+    const field = event.target;
+    if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) lastEditedField = field;
+  });
+  packSelect?.addEventListener('change', updatePackContext);
+  updatePackContext();
   form?.addEventListener('submit', event => {
     event.preventDefault();
     if (!form.reportValidity()) return;
@@ -41,14 +85,20 @@ import CoachingSteps from './CoachingSteps.astro';
     if (whatsapp) { whatsapp.hidden = !configured; if (configured) whatsapp.href = `https://wa.me/${phone}?text=${encodeURIComponent(enquiry)}`; }
     if (pending) pending.hidden = configured;
     form.hidden = true;
-    if (review) { review.hidden = false; preview?.setAttribute('tabindex', '-1'); preview?.focus({ preventScroll: true }); }
+    if (review) { review.hidden = false; focusInView(document.querySelector<HTMLElement>('#review-title')); }
   });
-  document.querySelector('.edit-enquiry')?.addEventListener('click', () => { if (form) form.hidden = false; if (review) review.hidden = true; form?.querySelector<HTMLInputElement>('input[name="name"]')?.focus({ preventScroll: true }); });
+  document.querySelector('.edit-enquiry')?.addEventListener('click', () => { if (form) form.hidden = false; if (review) review.hidden = true; focusInView(lastEditedField ?? form?.querySelector<HTMLInputElement>('input[name="name"]')); });
   document.querySelector('.copy-enquiry')?.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(enquiry); if (status) status.textContent = 'Copied. Paste your message into your conversation with Mohamed.'; }
     catch { if (preview) { const range = document.createRange(); range.selectNodeContents(preview); const selection = window.getSelection(); selection?.removeAllRanges(); selection?.addRange(range); } if (status) status.textContent = 'Select the message above and copy it to send to Mohamed.'; }
   });
   const reopen = () => { if (form) form.hidden = false; if (review) review.hidden = true; };
-  document.querySelectorAll<HTMLElement>('[data-pack-choice]').forEach(link => link.addEventListener('click', () => { reopen(); const pack = form?.querySelector<HTMLSelectElement>('[name="pack"]'); if (pack) pack.value = link.dataset.packChoice ?? ''; const goal = form?.querySelector<HTMLSelectElement>('[name="goal"]'); if (goal && link.dataset.goalChoice) goal.value = link.dataset.goalChoice; }));
-  document.querySelectorAll<HTMLElement>('[data-program-choice]').forEach(link => link.addEventListener('click', () => { reopen(); const value = link.dataset.programChoice ?? ''; const input = form?.querySelector<HTMLInputElement>('[name="program"]'); if (input) input.value = value; const label = document.querySelector<HTMLElement>('#selected-program'); if (label) { label.textContent = `Program interest: ${value}`; label.hidden = false; } const goal = form?.querySelector<HTMLSelectElement>('[name="goal"]'); if (goal) goal.value = value === 'Strength foundation' ? 'Get stronger' : value === 'Upper / lower split' ? 'Build muscle' : 'Build a consistent routine'; }));
+  document.querySelectorAll<HTMLElement>('[data-pack-choice]').forEach(link => link.addEventListener('click', () => { reopen(); if (packSelect) packSelect.value = link.dataset.packChoice ?? ''; updatePackContext(); const goal = form?.querySelector<HTMLSelectElement>('[name="goal"]'); if (goal && link.dataset.goalChoice) goal.value = link.dataset.goalChoice; }));
+  document.querySelectorAll<HTMLElement>('[data-program-choice]').forEach(link => link.addEventListener('click', () => { reopen(); const value = link.dataset.programChoice ?? ''; if (programInput) programInput.value = value; const label = document.querySelector<HTMLElement>('#selected-program-label'); if (label) label.textContent = `Program interest: ${value}`; if (programSelection) programSelection.hidden = !value; if (selectionStatus) selectionStatus.textContent = ''; const goal = form?.querySelector<HTMLSelectElement>('[name="goal"]'); if (goal) goal.value = value === 'Strength foundation' ? 'Get stronger' : value === 'Upper / lower split' ? 'Build muscle' : 'Build a consistent routine'; }));
+  document.querySelector('.remove-program')?.addEventListener('click', () => {
+    if (programInput) programInput.value = '';
+    if (programSelection) programSelection.hidden = true;
+    if (selectionStatus) selectionStatus.textContent = 'Sample program removed. You can still discuss your goals with Mohamed.';
+    focusInView(form?.querySelector<HTMLSelectElement>('[name="goal"]'));
+  });
 </script>

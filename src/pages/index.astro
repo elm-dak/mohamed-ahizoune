@@ -10,9 +10,10 @@ import SvgMark from '../components/SvgMark.astro';
 import FloatingEnquiry from '../components/FloatingEnquiry.astro';
 import { instagram } from '../data/site';
 const faqs = [
-  ['Where do I start?', 'Fill in the contact form with your goal and training experience. Review your enquiry, then use the available contact option to send it to Mohamed.'],
+  ['Where do I start?', 'Choose your goal and coaching pack, then share a little about your training experience. Review your message and open WhatsApp to send it directly to Mohamed.'],
   ['Do I need to be an experienced athlete?', 'Your starting point is part of the conversation. Whether you’re building your first routine or refining an established one, share your experience so Mohamed can discuss what’s appropriate for you.'],
-  ['How can I learn about coaching options?', 'Compare the Starter, Transformation, and Elite packs above. Choose a pack to add it to your enquiry, then contact Mohamed to discuss availability and how the coaching works.'],
+  ['Can I explore a program before choosing?', 'Yes. Open a sample week, select a training day, and explore the movements. You can save the sample or add it to your enquiry so Mohamed knows which approach interests you.'],
+  ['Does sending an enquiry commit me to a pack?', 'The form starts a conversation. It does not take a payment or create a subscription. Discuss your goals, availability, and coaching details with Mohamed before getting started.'],
   ['Where can I follow Mohamed’s journey?', 'Follow @_mohamed_ahizoune on Instagram for his latest training content and updates. You can open his profile from any Instagram link on this page.'],
 ];
 ---
@@ -26,7 +27,7 @@ const faqs = [
       try { const saved = localStorage.getItem('ma-theme'); document.documentElement.dataset.theme = saved === 'light' ? 'light' : 'dark'; } catch { document.documentElement.dataset.theme = 'dark'; }
     </script>
     <title>Mohamed Ahizoune | Built with purpose.</title>
-    <meta name="description" content="Meet Mohamed Ahizoune. Explore a focused approach to physique, strength, and personal progress. Connect on Instagram to discuss your goals." />
+    <meta name="description" content="Personal coaching with Mohamed Ahizoune. Six years of experience in physique and strength. Explore sample programs, compare coaching packs, and connect on WhatsApp." />
     <meta property="og:title" content="Mohamed Ahizoune | Built with purpose." />
     <meta property="og:description" content="The physique is the result. The discipline is the story. Discover Mohamed Ahizoune." />
     <meta property="og:type" content="website" />
@@ -101,9 +102,15 @@ const faqs = [
       const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle');
       const navigation = document.querySelector<HTMLElement>('#navigation');
       const closeMenu = () => { menuButton?.setAttribute('aria-expanded', 'false'); menuButton?.setAttribute('aria-label', 'Open navigation'); navigation?.classList.remove('is-open'); };
-      menuButton?.addEventListener('click', () => { const open = menuButton.getAttribute('aria-expanded') !== 'true'; menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation'); navigation?.classList.toggle('is-open', open); });
-      navigation?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-      document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
+      menuButton?.addEventListener('click', () => { const open = menuButton.getAttribute('aria-expanded') !== 'true'; menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation'); navigation?.classList.toggle('is-open', open); if (open) navigation?.querySelector<HTMLAnchorElement>('a')?.focus(); });
+      navigation?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+        closeMenu();
+        const target = document.querySelector<HTMLElement>(link.hash);
+        if (target) { target.tabIndex = -1; target.focus({ preventScroll: true }); }
+      }));
+      document.addEventListener('keydown', event => { if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') { closeMenu(); menuButton.focus(); } });
+      document.addEventListener('click', event => { if (event.target instanceof Node && !document.querySelector('.site-header')?.contains(event.target)) closeMenu(); });
+      document.addEventListener('focusin', event => { if (event.target instanceof Node && !document.querySelector('.site-header')?.contains(event.target)) closeMenu(); });
       window.matchMedia('(min-width: 761px)').addEventListener('change', closeMenu);
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
         const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } }), { threshold: 0.08 });

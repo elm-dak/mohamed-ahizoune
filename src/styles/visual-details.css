@@ -9,6 +9,29 @@
 .workout-meta small .svg-mark{width:18px;height:18px}
 .week-day .svg-mark{width:22px;height:22px;margin:0 auto 9px;color:#87917a}
 .week-day.is-training .svg-mark{color:var(--lime)}
+/* One calendar serves as both the weekly overview and the session selector. */
+.week-strip.session-tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:0 0 28px;padding:0;border:0}
+.week-strip.session-tabs .week-day{min-width:0;padding:15px 2px 13px;text-align:center;border:1px solid transparent;border-radius:10px;color:var(--muted);transition:background .25s var(--ease),border-color .25s var(--ease),transform .25s var(--ease)}
+.week-strip.session-tabs .week-day>span{display:block;font-size:10px;line-height:1.4;margin:0 0 11px;color:inherit}
+.week-strip.session-tabs .week-day strong{display:block;font-size:10px;font-weight:500;line-height:1.4;color:inherit}
+.week-strip.session-tabs button.week-day{background:#ffffff04;color:var(--ink)}
+.week-strip.session-tabs button.week-day:hover{background:#d6fb6f10;border-color:#d6fb6f40;transform:translateY(-2px)}
+.week-strip.session-tabs button.week-day[aria-selected=true]{background:#d6fb6f13;border-color:var(--lime);color:var(--lime);box-shadow:inset 0 -3px 0 var(--lime)}
+.week-strip.session-tabs .week-day .svg-mark{width:23px;height:23px;margin:0 auto 10px}
+.session-title{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 20px}
+.session-title h4{margin:0;font-weight:500;font-size:19px;letter-spacing:-.4px}
+.session-title>span{font-size:10px;color:var(--muted)}
+.session-track{height:3px;background:var(--line);overflow:hidden;border-radius:3px;margin-top:4px}
+.session-track>span{display:block;width:var(--session-progress,0%);height:100%;background:var(--lime);transition:width .35s var(--ease)}
+.session-panel.is-complete .session-progress output{color:var(--lime)}
+.session-panel .exercise-list label{transition:background .25s var(--ease)}
+.session-panel .exercise-list li:has(input:checked){background:#d6fb6f05}
+[data-theme=light] .week-strip.session-tabs button.week-day{background:#1e251b05}
+[data-theme=light] .week-strip.session-tabs button.week-day:hover{background:#e6edda;border-color:#4f692e40}
+[data-theme=light] .week-strip.session-tabs button.week-day[aria-selected=true]{background:#e0eacb;border-color:var(--lime);color:var(--lime)}
+[data-theme=light] .session-panel .exercise-list li:has(input:checked){background:#4f692e05}
+@media(max-width:760px){.week-strip.session-tabs{gap:4px}.week-strip.session-tabs .week-day{padding:12px 1px;border-radius:7px}.week-strip.session-tabs .week-day>span,.week-strip.session-tabs .week-day strong{font-size:9px}.week-strip.session-tabs .week-day .svg-mark{width:20px;height:20px}.session-title{gap:10px}.session-title h4{font-size:17px}.session-title>span{font-size:9px}}
+@media(max-width:360px){.week-strip.session-tabs{gap:3px}.week-strip.session-tabs .week-day>span,.week-strip.session-tabs .week-day strong{font-size:8px}.week-strip.session-tabs .week-day .svg-mark{width:18px;height:18px}}
 .skill-row{gap:21px;padding:25px 0}
 .skill-row .skill-glyph{display:grid;place-items:center;flex:0 0 54px;width:54px;height:54px;padding:0;border-radius:14px;background:#d6fb6f05;box-shadow:inset 0 1px 0 #ffffff12;position:relative;color:var(--lime);transition:background .45s var(--ease),transform .45s var(--ease)}
 .skill-glyph .svg-mark{width:40px;height:40px}

@@ -20,13 +20,20 @@ const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         <div class="workout-header"><div><span class="explorer-label">Sample program / 0{index + 1}</span><h3>{program.name}</h3></div><span class="workout-frequency">{program.frequency}</span></div>
         <p class="workout-description">{program.description}</p>
         <div class="workout-meta"><span><small><SvgMark kind="strength" />Equipment</small>{program.equipment}</span><span><small><SvgMark kind="coach" />Suited to</small>{program.level}</span></div>
-        <div class="week-strip" aria-label="Example weekly schedule">{program.schedule.map((label, day) => <div class:list={['week-day', { 'is-training': label !== 'Rest' }]}><span>{weekdays[day]}</span><SvgMark kind={label === 'Rest' ? 'recovery' : 'strength'} /><strong>{label}</strong></div>)}</div>
-        <div class="session-heading"><span class="explorer-label">Session preview</span><span class="session-hint">Choose a day below</span></div>
-        <div class="session-tabs" data-tab-group role="tablist" aria-label={`${program.name} sessions`}>{program.sessions.map((session, day) => <button role="tab" id={`day-${program.id}-${day}`} aria-selected={day === 0 ? 'true' : 'false'} aria-controls={`session-${program.id}-${day}`} tabindex={day === 0 ? 0 : -1}>{session.day}<span>{session.title}</span></button>)}</div>
+        <div class="session-heading"><span class="explorer-label">Your sample week</span><span class="session-hint">Select a training day</span></div>
+        <div class="week-strip session-tabs" data-tab-group role="tablist" aria-label={`${program.name} sessions`}>
+          {program.schedule.map((label, day) => {
+            const sessionIndex = program.sessions.findIndex(session => session.day === weekdays[day]);
+            const session = program.sessions[sessionIndex];
+            return session ? <button type="button" class="week-day is-training" role="tab" id={`day-${program.id}-${sessionIndex}`} aria-label={`${session.day}, ${session.title}`} aria-selected={sessionIndex === 0 ? 'true' : 'false'} aria-controls={`session-${program.id}-${sessionIndex}`} tabindex={sessionIndex === 0 ? 0 : -1}><span>{weekdays[day]}</span><SvgMark kind="strength" /><strong>{label}</strong></button> : <div class="week-day" role="presentation"><span>{weekdays[day]}</span><SvgMark kind="recovery" /><strong>Rest</strong></div>;
+          })}
+        </div>
         {program.sessions.map((session, day) => <div class="session-panel" role="tabpanel" id={`session-${program.id}-${day}`} aria-labelledby={`day-${program.id}-${day}`} hidden={day !== 0}>
+          <div class="session-title"><h4>{session.title}</h4><span>{session.exercises.length} movements to explore</span></div>
           <div class="exercise-columns" aria-hidden="true"><span>Movement / focus</span><span>Sets × reps</span></div>
           <ul class="exercise-list">{session.exercises.map(exercise => <li><label><input type="checkbox" aria-label={`Mark ${exercise.name} complete for ${session.day}`} /><span class="exercise-check" aria-hidden="true"></span><span class="exercise-name"><strong>{exercise.name}</strong><small>{exercise.focus}</small></span><span class="exercise-prescription">{exercise.sets}</span></label></li>)}</ul>
           <div class="session-progress"><output aria-live="polite">0 / {session.exercises.length} movements checked</output><button class="reset-session" type="button">Reset checklist</button></div>
+          <div class="session-track" aria-hidden="true"><span></span></div>
         </div>)}
         <p class="workout-note">{program.note}</p>
         <div class="workout-actions"><button class="download-program" type="button" data-program={program.id}>Save sample week <span aria-hidden="true">↓</span></button><a href="#contact" data-program-choice={program.name}>Make it personal <span aria-hidden="true">↗</span></a></div>
@@ -65,7 +72,12 @@ const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   document.querySelectorAll<HTMLElement>('.session-panel').forEach(panel => {
     const inputs = Array.from(panel.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'));
     const output = panel.querySelector('output');
-    const update = () => { if (output) output.textContent = `${inputs.filter(input => input.checked).length} / ${inputs.length} movements checked`; };
+    const update = () => {
+      const checked = inputs.filter(input => input.checked).length;
+      if (output) output.textContent = `${checked} / ${inputs.length} movements checked`;
+      panel.style.setProperty('--session-progress', `${checked / inputs.length * 100}%`);
+      panel.classList.toggle('is-complete', checked === inputs.length);
+    };
     inputs.forEach(input => input.addEventListener('change', update));
     panel.querySelector('.reset-session')?.addEventListener('click', () => { inputs.forEach(input => { input.checked = false; }); update(); });
   });
